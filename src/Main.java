@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
@@ -7,13 +6,13 @@ public class Main {
     static String[] products = {"Молоко", "Хлеб", "Гречневая крупа"};
     static int[] prices = {150, 200, 300};
 
-    static File saveFile = new File("basket.txt");
+    static File saveFile = new File("basket.bin");
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Basket basket;
 
         if (saveFile.exists()) {
-            basket = Basket.loadFromTxtFile(saveFile);
+            basket = Basket.loadFromBinFile(saveFile);
         } else {
             basket = new Basket(products, prices);
         }
@@ -43,11 +42,7 @@ public class Main {
                 System.out.println("Ошибка: неверный формат ввода");
                 continue;
             }
-            try {
-                basket.saveTxt(saveFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            basket.saveBin(saveFile);
             basket.printCart();
         }
     }

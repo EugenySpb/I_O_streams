@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.Arrays;
 
-public class Basket {
+public class Basket implements Serializable {
     private final String[] products;
     private final int[] prices;
     private static int[] cart;
@@ -9,17 +9,16 @@ public class Basket {
     public Basket(String[] products, int[] prices) {
         this.prices = prices;
         this.products = products;
-        this.cart = new int[products.length];
+        this.cart = new int[10];
     }
 
     public void addToCart(int productNum, int amount) {
-        if (productNum < 0 || productNum >= products.length) {
-            throw new IllegalArgumentException("Неверный номер продукта: " + productNum);
+        if (cart == null) {
+            cart = new int[10];
         }
-        if (amount < 0) {
-            throw new IllegalArgumentException("Недопустимое количество: " + amount);
+        if (productNum >= 0 && productNum < products.length && amount > 0) {
+            cart[productNum] += amount;
         }
-        cart[productNum] += amount;
     }
 
     public void printCart() {
@@ -76,6 +75,25 @@ public class Basket {
         }
         return basket;
     }
+
+    public void saveBin(File file) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            oos.writeObject(this);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Basket loadFromBinFile(File file) {
+        Basket basket;
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            basket = (Basket) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return basket;
+    }
+
 
     public int[] getPrices() {
         return prices;
