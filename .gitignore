@@ -1,3 +1,6 @@
+# Default ignored files
+/shelf/
+/workspace.xml
 .idea/
 target/
 *.iml
@@ -72,3 +75,11 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
