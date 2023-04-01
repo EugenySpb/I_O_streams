@@ -1,17 +1,44 @@
-package main.java;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.*;
-import java.util.Arrays;
 
-public class Basket {
-    private final String[] products;
-    private final int[] prices;
-    private static int[] cart;
+public class Basket implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private String[] products;
+    private int[] prices;
+    private int[] cart;
 
     public Basket(String[] products, int[] prices) {
-        this.prices = prices;
         this.products = products;
+        this.prices = prices;
         this.cart = new int[products.length];
+    }
+    public void saveToJsonFile(File file) {
+        try (PrintWriter writer = new PrintWriter(file)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String json = gson.toJson(this);
+            writer.print(json);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Basket loadFromJsonFile(File file) {
+        Basket basket;
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            StringBuilder builder = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+            Gson gson = new Gson();
+            basket = gson.fromJson(builder.toString(), Basket.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return basket;
     }
 
     public void addToCart(int productNum, int amount) {
@@ -37,48 +64,6 @@ public class Basket {
         System.out.println("Итого: " + sumProducts);
     }
 
-    public void saveTxt(File textFile) throws IOException {
-        try (PrintWriter out = new PrintWriter(textFile)) {
-            for (int price : prices) {
-                out.print(price + " ");
-            }
-            out.println();
-
-            for (String product : products) {
-                out.print(product + " ");
-            }
-            out.println();
-
-            for (int carts : cart) {
-                out.print(carts + " ");
-            }
-            out.println();
-        }
-    }
-
-    public static Basket loadFromTxtFile(File textFile) {
-        Basket basket = null;
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(textFile))) {
-            String pricesStr = bufferedReader.readLine();
-            String productsStr = bufferedReader.readLine();
-            String cartStr = bufferedReader.readLine();
-
-            int[] prices = Arrays.stream(pricesStr.split(" "))
-                    .mapToInt(Integer::parseInt)
-                    .toArray();
-            String[] products = productsStr.split(" ");
-            int[] cart = Arrays.stream(cartStr.split(" "))
-                    .mapToInt(Integer::parseInt)
-                    .toArray();
-
-            basket = new Basket(products, prices);
-            Basket.cart = cart;
-        } catch (IOException e) {
-            System.out.println("Ошибка чтения файла");
-        }
-        return basket;
-    }
-
     public int[] getPrices() {
         return prices;
     }
@@ -89,5 +74,9 @@ public class Basket {
 
     public int[] getCart() {
         return cart;
+    }
+
+    public void setCart(int[] cart) {
+        this.cart = cart;
     }
 }
